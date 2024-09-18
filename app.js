@@ -7,6 +7,7 @@ const app = express();
 const authRouter = require('./src/routes/authRoutes');
 const userRouter = require('./src/routes/userRoutes');
 const viewRouter = require('./src/routes/viewRoutes');
+const gameRouter = require('./src/routes/gameRoutes');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -21,6 +22,7 @@ app.use(session({
 app.use('/', viewRouter);
 app.use('/user/auth', authRouter);
 app.use('/user', userRouter);
+app.use('/game', gameRouter);
 
 app.use((req, res) => {
     res.status(404).sendFile(path.join(__dirname, './src/views/404NotFound.html'));

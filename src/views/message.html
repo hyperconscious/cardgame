@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="message-container">
+        <h2 id="message-title"></h2>
+        <p id="message-content"></p>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const type = urlParams.get('type');
+        const message = urlParams.get('message');
+
+        const messageTitle = document.getElementById('message-title');
+        const messageContent = document.getElementById('message-content');
+
+        if (type === 'success') {
+            messageTitle.textContent = 'Success!';
+            messageContent.textContent = message;
+            messageTitle.style.color = 'green';
+        } else if (type === 'error') {
+            messageTitle.textContent = 'Error!';
+            messageContent.textContent = message;
+            messageTitle.style.color = 'red';
+        } else {
+            messageTitle.textContent = 'Info';
+            messageContent.textContent = message || 'No message provided.';
+        }
+    </script>
+</body>
+</html>

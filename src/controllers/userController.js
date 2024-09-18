@@ -32,7 +32,7 @@ exports.login = async (req, res) => {
         if (user && await bcrypt.compare(password, user.password)) {
             req.session.user = {
                 login: user.login,
-                role: user.role
+                id: user.id
             };
             res.redirect('/');
             //res.redirect('/message?type=success&message=Login%20successful!');
