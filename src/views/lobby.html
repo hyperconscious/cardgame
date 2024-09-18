@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waiting for Opponent</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="http://localhost:3001/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <h1>Waiting for an Opponent...</h1>
+    <br>
+    <div id="status">Connecting...</div>
+
+    <script>
+        const roomId = new URLSearchParams(window.location.search).get('roomId');
+        const socket = io('http://localhost:3001'); // Connect to the server
+
+        // Notify the server that the user is waiting in the room
+        socket.emit('joinRoom', roomId);
+
+        socket.on('gameStarted', () => {
+            document.getElementById('status').innerText = 'Game Started! Redirecting...';
+            // Redirect to the game page
+            window.location.href = `/play?roomId=${roomId}`;
+        });
+
+        socket.on('disconnect', () => {
+            document.getElementById('status').innerText = 'Disconnected from the server.';
+        });
+    </script>
+</body>
+</html>
