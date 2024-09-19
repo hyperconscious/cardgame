@@ -14,7 +14,7 @@ const io = new Server(server, {
         methods: ["GET", "POST"]
     }
 });
-
+//test
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
