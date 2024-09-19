@@ -24,8 +24,7 @@ router.get('/home', (req, res) => {
             return res.status(500).send('Server error');
         }
 
-        let html = data.replace('%LOGIN%', req.session.user.login)
-                       .replace('%ROLE%', req.session.user.role);
+        let html = data.replace('%LOGIN%', req.session.user.login);
 
         res.send(html);
     });

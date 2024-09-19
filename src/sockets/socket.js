@@ -1,10 +1,17 @@
+const Room = require('../models/room');
+
 module.exports = (io) => {
     io.on('connection', (socket) => {
         console.log('Player connected:', socket.id);
 
-        socket.on('joinRoom', (roomId) => {
+        socket.on('joinRoom', async (roomId) => {
             socket.join(roomId);
             console.log(`Player ${socket.id} joined room ${roomId}`);
+
+            const room = await Room.findById(roomId);
+            if (room.isFull()) {
+                io.to(roomId).emit('gameStarted');
+            }
         });
 
         socket.on('playCard', (data) => {
