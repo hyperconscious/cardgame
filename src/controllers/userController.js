@@ -37,7 +37,6 @@ exports.login = async (req, res) => {
                 id: user.id
             };
             res.redirect('/');
-            //res.redirect('/message?type=success&message=Login%20successful!');
         } else {
             res.redirect('/message?type=error&message=Invalid%20login%20or%20password!');
         }
