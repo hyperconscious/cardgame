@@ -15,7 +15,7 @@ exports.register = async (req, res) => {
             return res.redirect('/message?type=error&message=User%20with%20this%20login%20or%20email%20already%20exists!');
         }
 
-        const newUser = new User({ login, password, full_name: fullName, email });
+        const newUser = new User({ login, password, email });
         await newUser.save();
         res.redirect('/message?type=success&message=User%20successfully%20registered!');
     } catch (error) {
