@@ -29,7 +29,7 @@
     const texture = await PIXI.Assets.load('https://cdn.pixabay.com/photo/2020/11/28/03/20/deadpool-5783526_640.png');
     const heartTex = await PIXI.Assets.load('https://cdn.pixabay.com/photo/2014/04/02/10/47/red-304570_640.png');
     const atkTex = await PIXI.Assets.load('https://cdn.pixabay.com/photo/2016/03/31/21/40/army-1296582_640.png');
-    const defTex = await PIXI.Assets.load('https://cdn.pixabay.com/photo/2014/04/03/00/38/shield-308943_1280.png');
+    const defTex = await PIXI.Assets.load('https://i.ibb.co/16C2ZNq/Pngtree-vector-shield-icon-3785558.png');
     const rectTex = await PIXI.Assets.load('https://cdn.pixabay.com/photo/2012/04/15/19/10/rectangle-34969_1280.png');
 
     texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;

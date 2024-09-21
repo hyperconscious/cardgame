@@ -3,7 +3,7 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 const { Server } = require('socket.io');
-
+const db = require('./../config/db');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
@@ -17,15 +17,18 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
     console.log('New client connected');
-    socket.emit('welcome', 'Welcome to the PixiJS Socket.io app!');
-    socket.on('move', (data) => {
-        socket.broadcast.emit('moveSprite', data);
-    });
-    socket.on('disconnect', () => {
-        console.log('Client disconnected');
+    socket.on('hello', (msg) => {
+        console.log(msg);
     });
 });
+
+// io.on('get_rand_card', (socket) => {
+//     socket.emit('test', 'testing');
+//     console.log('a');
+// });
 
 server.listen(3000, () => {
     console.log('Server is running on http://localhost:3000');
 });
+
+
