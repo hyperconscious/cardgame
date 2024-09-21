@@ -13,14 +13,12 @@
 
     <script>
         const roomId = new URLSearchParams(window.location.search).get('roomId');
-        const socket = io('http://localhost:3001'); // Connect to the server
+        const socket = io('http://localhost:3001');
 
-        // Notify the server that the user is waiting in the room
         socket.emit('joinRoom', roomId);
 
         socket.on('gameStarted', () => {
             document.getElementById('status').innerText = 'Game Started! Redirecting...';
-            // Redirect to the game page
             window.location.href = `play?roomId=${roomId}`;
         });
 

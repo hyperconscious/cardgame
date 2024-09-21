@@ -47,6 +47,28 @@ class Room {
             throw error;
         }
     }
+
+    async removePlayer(playerId) {
+        if (this.player1_id === playerId) {
+            this.player1_id = null;
+        } else if (this.player2_id === playerId) {
+            this.player2_id = null;
+        }
+
+        if (!this.isFull()) {
+            await db.query('UPDATE rooms SET player2_id = ?, status = "waiting" WHERE id = ?', [null, this.id]);
+            this.status = 'waiting';
+        }
+    }
+
+    static async deleteOne(roomId) {
+        try {
+            await db.query('DELETE FROM rooms WHERE id = ?', [roomId]);
+        } catch (error) {
+            console.error('Error deleting room:', error);
+            throw error;
+        }
+    }
 }
 
 module.exports = Room;
