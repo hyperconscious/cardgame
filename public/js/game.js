@@ -8,13 +8,6 @@
     // Append the application canvas to the document body
     document.body.appendChild(app.view);
 
-    // Create a linear gradient background
-    const gradientBackground = new PIXI.Graphics();
-    gradientBackground.beginFill(0x000000);
-    gradientBackground.drawRect(0, 0, app.screen.width, app.screen.height);
-    gradientBackground.endFill();
-    app.stage.addChild(gradientBackground);
-
     // Create a gradient texture
     const gradientTexture = PIXI.Texture.from('data:image/svg+xml;charset=utf-8,' +
         encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${app.screen.width}" height="${app.screen.height}">
@@ -27,7 +20,10 @@
             <rect width="100%" height="100%" fill="url(#grad1)" />
         </svg>`));
 
-    gradientBackground.texture = gradientTexture;
+    const gradientSprite = new PIXI.Sprite(gradientTexture);
+    gradientSprite.width = app.screen.width;
+    gradientSprite.height = app.screen.height;
+    app.stage.addChild(gradientSprite);
 
     // Load textures
     const texture = await PIXI.Assets.load('https://cdn.pixabay.com/photo/2020/11/28/03/20/deadpool-5783526_640.png');
@@ -41,12 +37,12 @@
     let cardFields = new Array(5);
     for (let i = 0; i < 5; i++) {
         const rect = new PIXI.Sprite(rectTex);
-        
+
         rect.width = 120;
         rect.height = 220;
         rect.anchor.set(0.5);
-        rect.x = rect.width * i + app.screen.width/2 - rect.width * 2;
-        rect.y = app.screen.height/2;
+        rect.x = rect.width * i + app.screen.width / 2 - rect.width * 2;
+        rect.y = app.screen.height / 2;
         rect.currentCard = null;
         app.stage.addChild(rect);
         cardFields[i] = rect;
@@ -63,12 +59,12 @@
 
     for (let i = 0; i < 5; i++) {
         const rect = new PIXI.Sprite(rectTex);
-        
+
         rect.width = 120;
         rect.height = 220;
         rect.anchor.set(0.5);
-        rect.x = rect.width * i + app.screen.width/2 - rect.width * 2;
-        rect.y = app.screen.height/2 - rect.height;
+        rect.x = rect.width * i + app.screen.width / 2 - rect.width * 2;
+        rect.y = app.screen.height / 2 - rect.height;
         app.stage.addChild(rect);
     }
 
@@ -117,15 +113,15 @@
         if (dragTarget) {
             dragTarget.position.set(event.data.global.x, event.data.global.y);
             const nearest = getNearestRect(dragTarget.x, dragTarget.y);
-            for (let i = 0; i < cardFields.length; i++) {
-                if (cardFields[i].currentCard || cardFields[i] != nearest[0]) {
-                    cardFields[i].tint = 0xffffff;
+            cardFields.forEach(field => {
+                if (field.currentCard) {
+                    field.tint = 0xffffff; // Reset if a card is already placed
+                } else {
+                    field.tint = 0xffffff; // Reset all fields
                 }
-            }
+            });
             if (nearest[1] < distToPlace) {
-                nearest[0].tint = 0xffff00;
-            } else {
-                nearest[0].tint = 0xffffff;
+                nearest[0].tint = 0xffff00; // Highlight nearest field
             }
         }
     }

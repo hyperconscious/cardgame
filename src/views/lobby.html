@@ -8,8 +8,7 @@
     <script src="http://localhost:3001/socket.io/socket.io.js"></script>
 </head>
 <body>
-    <h1>Waiting for an Opponent...</h1>
-    <br>
+    <h1 id="info">Waiting for an Opponent...</h1>
     <div id="status">Connecting...</div>
 
     <script>
@@ -22,7 +21,7 @@
         socket.on('gameStarted', () => {
             document.getElementById('status').innerText = 'Game Started! Redirecting...';
             // Redirect to the game page
-            window.location.href = `/play?roomId=${roomId}`;
+            window.location.href = `play?roomId=${roomId}`;
         });
 
         socket.on('disconnect', () => {
