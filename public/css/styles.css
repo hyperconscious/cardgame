@@ -23,15 +23,15 @@ html {
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
   width: 100%;
   max-width: 500px;
+  text-align: center;
 }
 
-.form-container {
-  background-color: #1e1e1e;
-  padding: 45px;
-  border-radius: 8px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-  width: 100%;
-  max-width: 500px;
+.home-container {
+  text-align: center;
+}
+
+.message-container {
+  text-align: center;
 }
 
 h1 {
@@ -85,7 +85,7 @@ button:hover {
 
 a {
   text-decoration: none;
-  color:#007bff;
+  color: #007bff;
 }
 
 #links {
@@ -118,8 +118,58 @@ a {
 
 .btn-container {
   display: flex;
+  justify-content: center;
+  justify-content: space-between;
+}
+
+.btn-container-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 #info {
   display: block;
+}
+
+#welcome {
+  color: #d4edda;
+}
+
+.btn-home {
+  display: inline-block;
+  padding: 10px 20px;
+  color: white;
+  background-color: #007bff;
+  text-decoration: none;
+  border-radius: 4px;
+  margin-top: 20px;
+}
+
+.btn-home:hover {
+  background-color: #0056b3;
+}
+
+.red {
+    color: #721c24;
+}
+
+.soft-red {
+    color: #f8d7da;
+}
+
+#avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover; 
+}
+
+input[type="file"] {
+  width: calc(100% - 22px);
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 4px;
+  background-color: #2e2e2e;
+  color: #f0f0f0;
 }

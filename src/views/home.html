@@ -1,60 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ua">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <style>
-      body {
-        background: linear-gradient(135deg, rgba(40, 10, 80, 0.8), rgba(60, 20, 120, 0.8));
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        color: #f0f0f0;
-      }
-
-      .home-container {
-        background-color: #1e1e1e;
-        padding: 30px;
-        border-radius: 8px;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-        width: 100%;
-        max-width: 500px;
-        text-align: center;
-      }
-
-      h1 {
-        color: #d4edda;
-      }
-
-      p {
-        color: #155724;
-      }
-
-      a {
-        display: inline-block;
-        padding: 10px 20px;
-        color: white;
-        background-color: #007bff;
-        text-decoration: none;
-        border-radius: 4px;
-        margin-top: 20px;
-      }
-
-      a:hover {
-        background-color: #0056b3;
-      }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home</title>
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
+
 <body>
-    <div class="home-container">
-        <h1>Welcome, %LOGIN%!</h1>
-        <a href="logout">Log Out</a>
-        <a href="../game">Go to game</a>
+  <div class="container">
+    <h1 id="welcome">Welcome, %LOGIN%!</h1>
+    <form id="avatarForm" enctype="multipart/form-data" method="POST" action="/upload-avatar">
+      <input type="file" name="avatarInput" accept="image/*" required>
+      <button type="submit">Upload Avatar</button>
+    </form>
+    <h2>Your Avatar</h2>
+    <img id="avatar" src="" alt="User Avatar">
+    <div class="btn-container">
+      <a class="btn-home" href="logout">Log Out</a>
+      <a class="btn-home" href="../game">Go to game</a>
     </div>
+  </div>
+  <script src="/js/uploadAvatar.js"></script>
+  <script>
+    window.onload = function () {
+      fetch('../user/user-avatar')
+        .then(response => response.json())
+        .then(data => {
+          const avatarSrc = data.avatar ? data.avatar : '/images/default-avatar.png';
+          document.getElementById('avatar').src = avatarSrc;
+        })
+        .catch(error => console.error('Error fetching avatar:', error));
+    };
+  </script>
 </body>
+
 </html>

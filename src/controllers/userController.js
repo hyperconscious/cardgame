@@ -95,3 +95,6 @@ exports.passwordReminder = async (req, res) => {
         res.redirect('/message?type=error&message=An%20error%20occurred.%20Please%20try%20again.');
     }
 }
+
+exports.uploadAvatar = async (req, res) => {
+}
