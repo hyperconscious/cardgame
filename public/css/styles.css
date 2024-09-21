@@ -10,6 +10,16 @@ body {
   height: 100vh;
   color: #f0f0f0;
   overflow: hidden;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none; 
+  user-select: none; 
+}
+
+img {
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
 }
 
 html {
@@ -129,7 +139,7 @@ a {
 }
 
 #info {
-  display: block;
+  display: inline-block;
 }
 
 #welcome {
@@ -172,4 +182,59 @@ input[type="file"] {
   border-radius: 4px;
   background-color: #2e2e2e;
   color: #f0f0f0;
+}
+
+.center {
+  width: 450px;
+  height: 200px;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#player-container {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  text-align: center;
+}
+
+#enemy-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  text-align: center;
+}
+
+#player-avatar, #enemy-avatar {
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  border: 2px solid #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+#player-hp, #enemy-hp {
+  left: 50%;
+  bottom: 10px;
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 22px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: rgb(255, 0, 0);
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+#player-nickname, #enemy-nickname {
+  font-size: 24px;
+  color: white;
+  z-index: 1;
+  margin-top: 10px;
 }

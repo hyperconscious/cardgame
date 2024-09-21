@@ -4,17 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Battle!</title>
-    <link rel="stylesheet" href="/public/css/styles.css">
+    <link rel="stylesheet" href="/css/styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.0.0/pixi.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/game.js" defer></script> 
 </head>
 <body>
-    <h1 id="info">Waiting for an Opponent...</h1>
-    <div id="status">Connecting...</div>
+    <div class="center">
+        <h1 id="info">Waiting for an Opponent...</h1>
+        <div id="status">Connecting...</div>
+    </div>
 
-    <script>
-        
-    </script>
+    <div id="player-container" style="display: none;">
+        <div id="player-info">
+            <div id="player-nickname">Nickname</div>
+            <img id="player-avatar" src="/images/default-avatar.png" alt="Player Avatar">
+            <div id="player-hp">HP: XX</div>
+        </div>
+    </div>
+    
+    <div id="enemy-container" style="display: none;">
+        <div id="enemy-info">
+            <div id="enemy-nickname">Nickname</div>
+            <img id="enemy-avatar" src="/images/default-avatar.png" alt="Enemy Avatar">
+            <div id="enemy-hp">HP: XX</div>
+        </div>
+    </div>
 </body>
 </html>

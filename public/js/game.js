@@ -9,6 +9,34 @@ class Card {
     }
 }
 
+function updatePlayerInfo(hp) {
+    document.getElementById('player-hp').textContent = `HP: ${hp}`;
+}
+
+
+function updateEnemyInfo(hp) {
+    document.getElementById('enemy-hp').textContent = `HP: ${hp}`;
+}
+
+async function loadAvatar(userId, targetElementId) {
+    try {
+        const response = await fetch(`/api/user-avatar/${userId}`);
+        const data = await response.json();
+        document.getElementById(targetElementId).src = data.avatar;
+    } catch (error) {
+        console.error('Error loading avatar:', error);
+    }
+}
+
+async function loadPlayersData(players) {
+    
+    await loadAvatar(players.isFirstPlayer ? players.user.id : players.enemy.id, 'player-avatar');
+    await loadAvatar(players.isFirstPlayer ? players.enemy.id : players.user.id, 'enemy-avatar');
+
+    document.getElementById('player-nickname').textContent = players.isFirstPlayer ? players.user.name : players.enemy.name;
+    document.getElementById('enemy-nickname').textContent = players.isFirstPlayer ? players.enemy.name : players.user.name;
+}
+
 
 (async () => {
     const socket = io();
@@ -17,43 +45,32 @@ class Card {
 
     socket.emit('joinRoom', roomId);
 
-
-
     socket.on('disconnect', () => {
         document.getElementById('status').innerText = 'Disconnected from the server.';
     });
     // Create a new PixiJS application
     const app = new PIXI.Application({
-        backgroundColor: 0x1099bb, // Background color
+        backgroundColor:  0x282c34, // Background color
         resizeTo: window // Resize canvas to fit the window
     });
 
-    socket.on('gameStarted', async () => {
-        document.getElementById('status').innerText = 'Game Started!';
+    socket.on('gameStarted', async (players) => {
+        document.getElementById('info').style.display = 'none';
+        document.getElementById('status').style.display = 'none';
+        document.getElementById('player-container').style.display = 'flex';
+        document.getElementById('enemy-container').style.display = 'flex';
+
+
+        loadPlayersData(players);
+        updateEnemyInfo(40);
+        updatePlayerInfo(40);
+
         socket.emit('getRandCard', null);
 
-    
         
         // Append the application canvas to the document body
         document.body.appendChild(app.view);
-    
-        // Create a gradient texture
-        const gradientTexture = PIXI.Texture.from('data:image/svg+xml;charset=utf-8,' +
-            encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${app.screen.width}" height="${app.screen.height}">
-                <defs>
-                    <linearGradient id="grad1" gradientTransform="rotate(135)">
-                        <stop offset="0%" style="stop-color: rgba(40, 10, 80, 0.8);" />
-                        <stop offset="100%" style="stop-color: rgba(60, 20, 120, 0.8);" />
-                    </linearGradient>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#grad1)" />
-            </svg>`));
-    
-        const gradientSprite = new PIXI.Sprite(gradientTexture);
-        gradientSprite.width = app.screen.width;
-        gradientSprite.height = app.screen.height;
-        app.stage.addChild(gradientSprite);
-    
+
         // Load textures
         const texture = await PIXI.Assets.load('https://cdn.pixabay.com/photo/2020/11/28/03/20/deadpool-5783526_640.png');
         const heartTex = await PIXI.Assets.load('https://cdn.pixabay.com/photo/2014/04/02/10/47/red-304570_640.png');
@@ -149,7 +166,7 @@ class Card {
             container.y = y;
             container.card = card;
 
-            container.addChild(spriteInit(await PIXI.Assets.load(card.avatar), 100, 200));
+            container.addChild(spriteInit(await PIXI.Assets.load(card.avatar), 150, 250));
             container.addChild(spriteInit(heartTex, 30, 30, -50, 100));
             container.addChild(spriteInit(atkTex, 30, 30, 40, 100));
             container.addChild(spriteInit(defTex, 30, 30, 0, 100));
@@ -188,16 +205,21 @@ class Card {
             if (this.isPlayed) return;
             this.alpha = 0.5;
             dragTarget = this;
+            
+            // Предотвращаем стандартное поведение
+            event.stopPropagation();
+            
             app.stage.on('pointermove', onDragMove);
             startPos = new PIXI.Point();
             dragTarget.position.copyTo(startPos);
         }
-    
+        
         function onDragEnd() {
             if (dragTarget) {
                 const nearest = getNearestRect(dragTarget.x, dragTarget.y);
                 app.stage.off('pointermove', onDragMove);
                 dragTarget.alpha = 1;
+                
                 if (nearest[1] > distToPlace || nearest[0].currentCard) {
                     dragTarget.position.copyFrom(startPos);
                 } else {
@@ -205,11 +227,13 @@ class Card {
                     dragTarget.position.copyFrom(nearest[0].position);
                     socket.emit('playCard', dragTarget.card, cardFields.indexOf(nearest[0]));
                     nearest[0].currentCard = dragTarget;
-                    nearest[0].tint = 0xffffff; // Reset tint after placement
+                    nearest[0].tint = 0xffffff; // Сбросить оттенок после размещения
                 }
+                
                 dragTarget = null;
             }
         }
+        
     
         function getNearestRect(x, y) {
             let nearest = cardFields[0];

@@ -5,7 +5,7 @@ document.getElementById('avatarForm').addEventListener('submit', async (event) =
     const formData = new FormData(event.target);
 
     try {
-        const response = await fetch('../user/upload-avatar', {
+        const response = await fetch('/api/upload-avatar', {
             method: 'POST',
             body: formData,
         });

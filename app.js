@@ -33,10 +33,12 @@ const authRouter = require('./src/routes/authRoutes');
 const userRouter = require('./src/routes/userRoutes');
 const viewRouter = require('./src/routes/viewRoutes');
 const gameRouter = require('./src/routes/gameRoutes');
+const avatarRouter = require('./src/routes/avatarRoutes');
 
 app.use('/', viewRouter);
 app.use('/user/auth', authRouter);
 app.use('/user', userRouter);
+app.use('/api', avatarRouter);
 app.use('/game', gameRouter);
 
 app.use((req, res) => {
