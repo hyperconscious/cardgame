@@ -8,11 +8,10 @@ exports.findGame = async (req, res) => {
         let room = await Room.findWaitingRoom();
         if (!room) {
             room = await Room.create(userId);
-            res.redirect(`wait-for-opponent?roomId=${room.id}`);
+            res.redirect(`play?roomId=${room.id}`);
         } else {
-            console.log('room was found joining...');
             await room.join(userId);
-            res.redirect(`wait-for-opponent?roomId=${room.id}`);
+            res.redirect(`play?roomId=${room.id}`);
         }
     } catch (error) {
         console.error(error);

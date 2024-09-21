@@ -13,7 +13,6 @@ router.use((req, res, next) => {
   });
 
 router.get('/', (req, res) => res.sendFile(path.join(__dirname, '../views/mainGame.html')));
-router.get('/wait-for-opponent', (req, res) => res.sendFile(path.join(__dirname, '../views/lobby.html')));
 router.get('/play', gameController.playGame);
 router.post('/find-game', gameController.findGame);
 
