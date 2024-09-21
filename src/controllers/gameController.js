@@ -5,11 +5,8 @@ const User = require('../models/user');
 exports.findGame = async (req, res) => {
     try {
         const userId = req.session.user.id;
-        console.log('finding free room...');
         let room = await Room.findWaitingRoom();
-
         if (!room) {
-            console.log('room isn\'t find creating new...');
             room = await Room.create(userId);
             res.redirect(`wait-for-opponent?roomId=${room.id}`);
         } else {

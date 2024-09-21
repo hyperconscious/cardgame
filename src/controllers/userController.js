@@ -1,9 +1,11 @@
+require('dotenv').config();
+
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 
 exports.register = async (req, res) => {
-    const { login, password, confirmPassword, fullName, email } = req.body;
+    const { login, password, confirmPassword, email } = req.body;
 
     if (password !== confirmPassword) {
         return res.redirect('/message?type=error&message=Passwords%20do%20not%20match!');
