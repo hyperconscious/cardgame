@@ -1,8 +1,7 @@
-CREATE DATABASE marvel_battle;
+CREATE DATABASE IF NOT EXISTS marvel_battle;
 
 USE marvel_battle;
 
-GRANT ALL PRIVILEGES ON marvel_battle.* TO 'knikonov'@'localhost';
 FLUSH PRIVILEGES;
 
 CREATE TABLE users (
