@@ -1,7 +1,11 @@
 const Room = require('../models/room');
+const Card = require('../models/card');
 
 module.exports = (io) => {
     io.on('connection', (socket) => {
+
+        let roomsData = {};
+
         console.log('Player connected:', socket.id);
 
         socket.on('joinRoom', async (roomId) => {
@@ -11,6 +15,10 @@ module.exports = (io) => {
             const room = await Room.findById(roomId);
             if (room.isFull()) {
                 io.to(roomId).emit('gameStarted');
+                roomsData[roomId] = {
+                    cardsLeft: await Card.getAllCards()
+                }
+                console.log('cards inited');
             }
         });
 
@@ -38,6 +46,12 @@ module.exports = (io) => {
                     console.log(`Removing player ${socket.id}`)
                 }
             }
+        });
+
+        socket.on('getRandCard', () => {
+            //console.log('room = ' + Array.from(socket.rooms));
+            //Array.from(socket.rooms).filter(roomId => roomId !== socket.id);
+            //socket.emit('receiveCard', roomsData[Array.from(socket.rooms)[0]].cardsLeft[0]);
         });
     });
 };

@@ -1,10 +1,17 @@
+
+const socket = io();
+
 (async () => {
     // Create a new PixiJS application
     const app = new PIXI.Application({
         backgroundColor: 0x1099bb, // Background color
         resizeTo: window // Resize canvas to fit the window
     });
-
+    socket.emit('gameStarted', null);
+    socket.emit('getRandCard', null);
+    socket.on('receiveCard', (card) => {
+        console.log(card);
+    });
     // Append the application canvas to the document body
     document.body.appendChild(app.view);
 
