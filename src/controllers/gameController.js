@@ -28,5 +28,5 @@ exports.playGame = (req, res) => {
     if (!roomId) {
         return res.redirect('/message?type=error&message=Invalid%20room');
     }
-    res.sendFile(path.join(__dirname, '../views/lobby.html'));
+    res.sendFile(path.join(__dirname, '../views/game.html'));
 };
