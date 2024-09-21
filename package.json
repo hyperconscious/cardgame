@@ -1,28 +1,12 @@
 {
-  "name": "cardgame",
-  "version": "1.0.0",
-  "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "busboy": "^1.6.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "express-session": "^1.18.0",
     "mysql2": "^3.11.3",
     "nodemailer": "^6.9.15",
-    "pixijs": "^7.1.4",
-    "socket.io": "^4.7.5"
-  },
-  "devDependencies": {
-    "socket.io-client": "^4.7.5",
-    "webpack": "^5.94.0",
-    "webpack-cli": "^5.1.4"
+    "socket.io": "^4.8.0"
   }
 }

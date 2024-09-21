@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const router = express.Router();
 const userController = require('../controllers/userController');
+const avatarController = require('../controllers/avatarController');
 
 router.post('/login', userController.login);
 router.post('/register', userController.register);
@@ -29,5 +30,9 @@ router.get('/home', (req, res) => {
         res.send(html);
     });
 });
+
+router.post('/upload-avatar', avatarController.uploadAvatar);
+
+router.get('/user-avatar', avatarController.getUserAvatar);
 
 module.exports = router;
