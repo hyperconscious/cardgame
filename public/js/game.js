@@ -62,12 +62,13 @@ async function loadPlayersData(players) {
         document.getElementById('enemy-container').style.display = 'flex';
 
         myPoints = 10;
-        loadPlayersData(players);
+        await loadPlayersData(players);
         updateEnemyInfo(40);
         updatePlayerInfo(40);
 
         socket.emit('getRandCard', null);
 
+        socket.emit('getTurn');
         
         // Append the application canvas to the document body
         document.body.appendChild(app.view);
@@ -151,9 +152,11 @@ async function loadPlayersData(players) {
             ind = 0;
             for(let i = 0; i < handFields.length; i++){
                 if(!handFields[i]) {
+                    console.log('Creating card:', cards[ind]);
                     handFields[i] = await createCard(cards[ind], app.screen.width / 2 + (200 * (i - 2)), app.screen.height - 200);
                     ind++;
                 }
+                
             }
         });
 
@@ -175,6 +178,7 @@ async function loadPlayersData(players) {
         getFullHand();
         
         socket.on('enemyCardPlayed', async (card, field) => {
+
             const rect = await createCard(card, enemyCardFields[field].x, enemyCardFields[field].y);
             rect.isPlayed = true;
             rect.costText.visible = false;
@@ -185,6 +189,31 @@ async function loadPlayersData(players) {
             setTurn(isMyTurn);
             if(isMyTurn) {
                 getFullHand();
+            }
+        });
+
+        socket.on('updateBattleField', (playerHp, enemyHp, myCardsOnField, enemyCardsOnField) => {
+            updatePlayerInfo(playerHp);
+            updateEnemyInfo(enemyHp);
+            for(let i = 0; i < cardFields.length; i++)
+            {
+                console.log('i = ' + i + ' ' + myCardsOnField);
+                if(cardFields[i].currentCard)
+                    if(!myCardsOnField[i]) {
+                        cardFields[i].currentCard.destroy();
+                    } else {
+                        cardFields[i].currentCard.card = myCardsOnField[i];
+                        console.log(myCardsOnField[i].defense);
+                        updateCardView(cardFields[i].currentCard);
+                    }
+                if(enemyCardFields[i].currentCard)
+                    if(!enemyCardsOnField[i]) {
+                        enemyCardFields[i].currentCard.destroy();
+                    } else if (enemyCardsOnField[i]){
+                        enemyCardFields[i].currentCard.card = enemyCardsOnField[i];
+                        updateCardView(enemyCardFields[i].currentCard);
+                    }
+                
             }
         });
 
@@ -268,8 +297,7 @@ async function loadPlayersData(players) {
 
             heart = spriteInit(heartTex, 30, 30, -50, 100);
             attack = spriteInit(atkTex, 30, 30, 40, 100);
-            console.log('defTest = '+ card.defense);
-            container.addChild(spriteInit(await PIXI.Assets.load(card.avatar), 150, 250));
+            container.addChild(await spriteInit(await PIXI.Assets.load(card.avatar), 150, 250));
             container.addChild(heart);
             container.addChild(attack);
             //container.addChild(spriteInit(costTex, 30, 30, 0, 100));
@@ -366,7 +394,7 @@ async function loadPlayersData(players) {
                 
                 if (nearest[1] > distToPlace || nearest[0].currentCard) {
                     dragTarget.position.copyFrom(startPos);
-                    setPoints(myPoints +dragTarget.card.cost);
+                    setPoints(myPoints + dragTarget.card.cost);
                     dragTarget.costText.visible = true;
                 } else {
                     dragTarget.isPlayed = true;
