@@ -238,3 +238,34 @@ input[type="file"] {
   z-index: 1;
   margin-top: 10px;
 }
+
+.battlelog {
+  position: absolute;
+  left: 0.5%;
+  top: 40%;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transform: translate(0, -10%);
+  box-shadow: 0 4px 8px rgba(252, 249, 255, 0.1);
+}
+
+.log {
+  color: #315269;
+  padding: 15px;
+  margin: 7px;
+  background-color: rgba(245, 226, 255, 0.233);
+}
+
+.log textarea {
+  border-radius: 5px;
+  font-size: 17px;
+  background: white;
+  color: black;
+}
+
+.log p {
+  font-size: 22px;
+  color: black;
+}
