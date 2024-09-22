@@ -232,7 +232,6 @@ async function loadPlayersData(players, isFirstPlayer) {
             text.y = 100;
             text.x = app.screen.width/2;
             app.stage.addChild(text);
-
         }
         
         getFullHand();
@@ -256,14 +255,17 @@ async function loadPlayersData(players, isFirstPlayer) {
         let timeLeft = 30;
         socket.on('win', () => {
             changeGameState('you win');
+            addLogEntry(battleLog, `You win!`, 'player');
         });
 
         socket.on('lose', () => {
             changeGameState('you lose');
+            addLogEntry(battleLog, `You lose!`, 'player');
         });
 
         socket.on('draw', () => {
             changeGameState('draw');
+            addLogEntry(battleLog, `draw`);
         });
 
         socket.on('updateBattleField', (playerHp, enemyHp, myCardsOnField, enemyCardsOnField) => {

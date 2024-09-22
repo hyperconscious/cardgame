@@ -1,5 +1,6 @@
 CREATE DATABASE IF NOT EXISTS marvel_battle;
-
+CREATE USER IF NOT EXISTS 'knikonov'@'localhost' IDENTIFIED BY 'secure_pass';
+GRANT ALL ON cards_web.* TO 'knikonov'@'localhost';
 USE marvel_battle;
 
 FLUSH PRIVILEGES;
