@@ -144,6 +144,7 @@ async function loadPlayersData(players, isFirstPlayer) {
         pointsText.x = 50;
         pointsText.y = app.screen.height - 200;
         app.stage.addChild(pointsText);
+        let isGame = true;
         isMyTurn = isTurn;
         basicText.text = isTurn ? 'Your turn' : 'Not your turn\n just wait(';
 
@@ -215,6 +216,24 @@ async function loadPlayersData(players, isFirstPlayer) {
         
             
         }
+
+        function changeGameState(state)
+        {
+            isGame = false;
+            const text = new PIXI.Text(state, {
+                fontFamily: 'Arial',
+                fontSize: 50,         
+                fill: 0xffffff,        
+                align: 'center',       
+                stroke: 0x000000,      
+                strokeThickness: 4     
+            });
+            text.anchor.set(0.5);
+            text.y = 100;
+            text.x = app.screen.width/2;
+            app.stage.addChild(text);
+
+        }
         
         getFullHand();
         
@@ -231,6 +250,19 @@ async function loadPlayersData(players, isFirstPlayer) {
             if(isMyTurn) {
                 getFullHand();
             }
+        });
+
+
+        socket.on('win', () => {
+            changeGameState('you win');
+        });
+
+        socket.on('lose', () => {
+            changeGameState('you lose');
+        });
+
+        socket.on('draw', () => {
+            changeGameState('draw');
         });
 
         socket.on('updateBattleField', (playerHp, enemyHp, myCardsOnField, enemyCardsOnField) => {
@@ -333,8 +365,7 @@ async function loadPlayersData(players, isFirstPlayer) {
         // }
         
         function nextTurn() {
-            console.log('try');
-            if(!isMyTurn) return;
+            if(!isMyTurn || !isGame) return;
             socket.emit('nextTurn');
         }
     
@@ -455,7 +486,7 @@ async function loadPlayersData(players, isFirstPlayer) {
         let startPos = null;
     
         function onDragStart(event) {
-            if (this.isPlayed || !isMyTurn || this.card.cost > myPoints) return;
+            if (this.isPlayed || !isMyTurn || this.card.cost > myPoints || !isGame) return;
             this.alpha = 0.5;
             dragTarget = this;
             

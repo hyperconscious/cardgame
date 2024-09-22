@@ -122,6 +122,21 @@ module.exports = (io) => {
                 room.firstPlayerHp,
                 room.secondPlayerDeployed, 
                 room.firstPlayerDeployed);
+
+            if(room.firstPlayerHp <= 0 && room.secondPlayerHp > 0) {
+                io.to(room.firstPlayer).emit('lose');
+                io.to(room.secondPlayer).emit('win');
+            }
+
+            if(room.firstPlayerHp > 0 && room.secondPlayerHp <= 0) {
+                io.to(room.firstPlayer).emit('win');
+                io.to(room.secondPlayer).emit('lose');
+            }
+
+            if(room.firstPlayerHp <= 0 && room.secondPlayerHp <= 0) {
+                io.to(room.firstPlayer).emit('draw');
+                io.to(room.secondPlayer).emit('draw');
+            }
         }
 
         socket.on('disconnecting', async () => {
