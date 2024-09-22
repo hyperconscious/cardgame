@@ -72,9 +72,10 @@ module.exports = (io) => {
             for(let i = 0; i < count; i++)
             {
                 result[i] = await Card.getRandCard();
-                console.log(result[i]);
+                if(!result[i]) i--; 
+                console.log(result[i].avatar);
             }
-            socket.emit('receiveCards', result);
+            socket.emit('receiveCards', await result);
         });
 
         socket.on('nextTurn', () => {
@@ -135,7 +136,7 @@ module.exports = (io) => {
                     await Room.deleteOne(roomId);
                     delete roomsData[roomId];
                     console.log(`Deleting room...`);
-                } else if (socket.userId === room.player2_id)  {
+                } else if (socket.userId === room.player2_id) {
                     room.removePlayer(socket.id);
                     console.log(`Removing player ${socket.id}`);
                 }

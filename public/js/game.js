@@ -154,7 +154,7 @@ async function loadPlayersData(players, isFirstPlayer) {
             for(let i = 0; i < handFields.length; i++){
                 console.log('handfields[i] : ', handFields[i]);
                 if(!handFields[i]) {
-                    console.log('Creating card:', cards[ind]);
+                    console.log('Creating card:', cards[ind], cards[ind].character_name);
                     handFields[i] = await createCard(cards[ind], app.screen.width / 2 + (200 * (i - 2)), app.screen.height - 200);
                     ind++;
                 }
@@ -203,6 +203,7 @@ async function loadPlayersData(players, isFirstPlayer) {
                 if(cardFields[i].currentCard)
                     if(!myCardsOnField[i]) {
                         cardFields[i].currentCard.destroy();
+                        cardFields[i].currentCard = null;
                     } else {
                         cardFields[i].currentCard.card = myCardsOnField[i];
                         console.log(myCardsOnField[i].defense);
@@ -311,7 +312,10 @@ async function loadPlayersData(players, isFirstPlayer) {
 
             heart = spriteInit(heartTex, 30, 30, -50, 100);
             attack = spriteInit(atkTex, 30, 30, 40, 100);
-            container.addChild(await spriteInit(await PIXI.Assets.load(card.avatar), 150, 250));
+
+            console.log('card: ', card.avatar);
+            avatar = await PIXI.Assets.load(String(card.avatar));
+            container.addChild(spriteInit(avatar, 150, 250));
             container.addChild(heart);
             container.addChild(attack);
             //container.addChild(spriteInit(costTex, 30, 30, 0, 100));
