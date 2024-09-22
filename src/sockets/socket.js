@@ -22,7 +22,7 @@ module.exports = (io) => {
                 const user = await User.findById(room.player2_id);
                 const enemy = await User.findById(room.player1_id);
 
-                players = {
+                const players = {
                     user: {
                         id: user.id,
                         name: user.login
@@ -30,9 +30,9 @@ module.exports = (io) => {
                     enemy: {
                         id: enemy.id,
                         name: enemy.login
-                    },
-                    isFirstPlayer: socket.userId === room.player1_id
+                    }
                 };
+                const isFirstPlayer = socket.userId === room.player1_id;
 
                 roomsData[parseInt(roomId)].firstPlayerCards = new Array(5);
                 roomsData[parseInt(roomId)].secondPlayerCards = new Array(5);
@@ -41,8 +41,8 @@ module.exports = (io) => {
                 roomsData[parseInt(roomId)].secondPlayer = socket.id;
                 roomsData[parseInt(roomId)].secondPlayerHp = 40;
                 
-                io.to(roomsData[parseInt(roomId)].secondPlayer).emit('gameStarted', false, players);
-                io.to(roomsData[parseInt(roomId)].firstPlayer).emit('gameStarted', true, players);
+                io.to(roomsData[parseInt(roomId)].secondPlayer).emit('gameStarted', false, players, !isFirstPlayer);
+                io.to(roomsData[parseInt(roomId)].firstPlayer).emit('gameStarted', true, players, isFirstPlayer);
                 
             }else{
                 roomsData[parseInt(roomId)] = {};
@@ -128,7 +128,6 @@ module.exports = (io) => {
             const rooms = Array.from(socket.rooms).filter(roomId => roomId !== socket.id);
             for (const roomId of rooms) {
                 console.log(`Leaving room ${roomId}, player: ${socket.userId}`);
-                socket.leave(roomId);
             
                 const room = await Room.findById(roomId);
                 if(!room) return;
@@ -141,6 +140,7 @@ module.exports = (io) => {
                     room.removePlayer(socket.id);
                     console.log(`Removing player ${socket.id}`);
                 }
+                socket.leave(roomId);
             }
         });
 

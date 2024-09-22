@@ -29,13 +29,13 @@ async function loadAvatar(userId, targetElementId) {
     }
 }
 
-async function loadPlayersData(players) {
+async function loadPlayersData(players, isFirstPlayer) {
     
-    await loadAvatar(players.isFirstPlayer ? players.user.id : players.enemy.id, 'player-avatar');
-    await loadAvatar(players.isFirstPlayer ? players.enemy.id : players.user.id, 'enemy-avatar');
+    await loadAvatar(isFirstPlayer ? players.user.id : players.enemy.id, 'player-avatar');
+    await loadAvatar(isFirstPlayer ? players.enemy.id : players.user.id, 'enemy-avatar');
 
-    document.getElementById('player-nickname').textContent = players.isFirstPlayer ? players.user.name : players.enemy.name;
-    document.getElementById('enemy-nickname').textContent = players.isFirstPlayer ? players.enemy.name : players.user.name;
+    document.getElementById('player-nickname').textContent = isFirstPlayer ? players.user.name : players.enemy.name;
+    document.getElementById('enemy-nickname').textContent = isFirstPlayer ? players.enemy.name : players.user.name;
 }
 
 
@@ -55,14 +55,14 @@ async function loadPlayersData(players) {
         resizeTo: window 
     });
 
-    socket.on('gameStarted', async (isTurn, players) => {
+    socket.on('gameStarted', async (isTurn, players, isFirstPlayer) => {
         document.getElementById('info').style.display = 'none';
         document.getElementById('status').style.display = 'none';
         document.getElementById('player-container').style.display = 'flex';
         document.getElementById('enemy-container').style.display = 'flex';
 
         myPoints = 10;
-        await loadPlayersData(players);
+        await loadPlayersData(players, isFirstPlayer);
         updateEnemyInfo(40);
         updatePlayerInfo(40);
 
@@ -78,9 +78,10 @@ async function loadPlayersData(players) {
         const heartTex = await PIXI.Assets.load('https://cdn.pixabay.com/photo/2014/04/02/10/47/red-304570_640.png');
         const atkTex = await PIXI.Assets.load('https://cdn.pixabay.com/photo/2016/03/31/21/40/army-1296582_640.png');
         const costTex = await PIXI.Assets.load('https://cdn.pixabay.com/photo/2017/02/22/20/03/crystal-ball-2090496_1280.png');
-        const rectTex = await PIXI.Assets.load('https://cdn.pixabay.com/photo/2012/04/15/19/10/rectangle-34969_1280.png');
 
         //shield img 'https://i.ibb.co/16C2ZNq/Pngtree-vector-shield-icon-3785558.png'
+        const defTex = await PIXI.Assets.load('https://i.ibb.co/16C2ZNq/Pngtree-vector-shield-icon-3785558.png');
+        const rectTex = await PIXI.Assets.load('https://cdn.pixabay.com/photo/2023/01/10/02/16/pattern-7708699_1280.png');
     
         const basicText = new PIXI.Text('Not your turn\n just wait(', {
             fontFamily: 'Arial',     
@@ -151,6 +152,7 @@ async function loadPlayersData(players) {
             //createCard(card, app.screen.width / 2, app.screen.height - 200);
             ind = 0;
             for(let i = 0; i < handFields.length; i++){
+                console.log('handfields[i] : ', handFields[i]);
                 if(!handFields[i]) {
                     console.log('Creating card:', cards[ind], cards[ind].character_name);
                     handFields[i] = await createCard(cards[ind], app.screen.width / 2 + (200 * (i - 2)), app.screen.height - 200);
@@ -218,46 +220,58 @@ async function loadPlayersData(players) {
             }
         });
 
+        function calculatePoints(currentPoints, income, incomeRate, level, maxPoints){
+            let newPoints = currentPoints + income + incomeRate * level;
+
+            if (newPoints > maxPoints) {
+                newPoints =maxPoints;
+            }
+
+            return Math.ceil(newPoints);
+        }
+
         function setTurn(val){
             isMyTurn = val;
             console.log('yey ' + val);
             basicText.text = val ? 'Your turn' : 'Not your turn\n just wait(';
-            if(val){
-                setPoints(myPoints + 2);
+            if(!val){
+                myPoints = calculatePoints(myPoints, 3, (myPoints / 5), 3, 24);
             }
         }
 
         for (let i = 0; i < 5; i++) {
             const rect = new PIXI.Sprite(rectTex);
     
-            rect.width = 120;
-            rect.height = 220;
+            rect.width = 160;
+            rect.height = 260;
             rect.anchor.set(0.5);
-            rect.x = rect.width * i + app.screen.width / 2 - rect.width * 2;
+            rect.x = (rect.width + 30) * i + app.screen.width / 2 - (rect.width + 30) * 2;
             rect.y = app.screen.height / 2;
-            rect.currentCard = null;
+            rect.zIndex = 2;
+            rect.currentCard = null;    
             app.stage.addChild(rect);
             cardFields[i] = rect;
     
-            // Add hover effect
-            rect.interactive = true;
-            rect.on('pointerover', () => {
-                rect.tint = 0x555555; 
-            });
-            rect.on('pointerout', () => {
-                if (!rect.currentCard) rect.tint = 0xffffff; 
-            });
+            // // Add hover effect
+            // rect.interactive = true;
+            // rect.on('pointerover', () => {
+            //     rect.tint = 0x555555; 
+            // });
+            // rect.on('pointerout', () => {
+            //     if (!rect.currentCard) rect.tint = 0xffffff; 
+            // });
         }
 
         for (let i = 0; i < 5; i++) {
             const rect = new PIXI.Sprite(rectTex);
     
-            rect.width = 120;
-            rect.height = 220;
+            rect.width = 160;
+            rect.height = 260;
             rect.anchor.set(0.5);
             rect.currentCard = null;
-            rect.x = rect.width * i + app.screen.width / 2 - rect.width * 2;
+            rect.x = (rect.width + 30) * i + app.screen.width / 2 - (rect.width + 30) * 2;
             rect.y = app.screen.height / 2 - rect.height;
+            rect.zIndex = 2;
             app.stage.addChild(rect);
             enemyCardFields[i] = rect;
         }
@@ -274,7 +288,7 @@ async function loadPlayersData(players) {
             socket.emit('nextTurn');
         }
     
-        function spriteInit(tex, width = 100, height = 100, x = 0, y = 0) {
+        function spriteInit(    tex, width = 100, height = 100, x = 0, y = 0) {
             const obj = new PIXI.Sprite(tex);
             obj.anchor.set(0.5);
             obj.width = width;
@@ -294,6 +308,7 @@ async function loadPlayersData(players) {
             container.isPlayed = false;
             container.x = x;
             container.y = y;
+            container.zIndex = 1;
             container.card = card;
 
             heart = spriteInit(heartTex, 30, 30, -50, 100);
