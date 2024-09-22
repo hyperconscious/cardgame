@@ -49,10 +49,10 @@ async function loadPlayersData(players, isFirstPlayer) {
     socket.on('disconnect', () => {
         document.getElementById('status').innerText = 'Disconnected from the server.';
     });
-    // Create a new PixiJS application
+
     const app = new PIXI.Application({
-        backgroundColor:  0x282c34, // Background color
-        resizeTo: window // Resize canvas to fit the window
+        backgroundColor:  0x282c34,
+        resizeTo: window 
     });
 
     socket.on('gameStarted', async (isTurn, players, isFirstPlayer) => {
@@ -76,6 +76,9 @@ async function loadPlayersData(players, isFirstPlayer) {
         const buttonTex = await PIXI.Assets.load('https://cdn.pixabay.com/photo/2015/07/25/07/58/the-button-859345_1280.png');
         const heartTex = await PIXI.Assets.load('https://cdn.pixabay.com/photo/2014/04/02/10/47/red-304570_640.png');
         const atkTex = await PIXI.Assets.load('https://cdn.pixabay.com/photo/2016/03/31/21/40/army-1296582_640.png');
+        const costTex = await PIXI.Assets.load('https://cdn.pixabay.com/photo/2017/02/22/20/03/crystal-ball-2090496_1280.png');
+
+        //shield img 'https://i.ibb.co/16C2ZNq/Pngtree-vector-shield-icon-3785558.png'
         const defTex = await PIXI.Assets.load('https://i.ibb.co/16C2ZNq/Pngtree-vector-shield-icon-3785558.png');
         const rectTex = await PIXI.Assets.load('https://cdn.pixabay.com/photo/2023/01/10/02/16/pattern-7708699_1280.png');
     
@@ -101,7 +104,7 @@ async function loadPlayersData(players, isFirstPlayer) {
             strokeThickness: 4       
         });
 
-        pointsText.x = 300;
+        pointsText.x = 50;
         pointsText.y = app.screen.height - 200;
         app.stage.addChild(pointsText);
         isMyTurn = isTurn;
@@ -110,7 +113,7 @@ async function loadPlayersData(players, isFirstPlayer) {
         button = new PIXI.Sprite(buttonTex);
         button.width = 120;
         button.height = 30;
-        button.x = 100;
+        button.x = app.screen.width - 100;
         button.y = app.screen.height * 0.5;
         button.interactive = true;
         button.anchor.set(0.5);
@@ -142,35 +145,49 @@ async function loadPlayersData(players, isFirstPlayer) {
 
         let cardFields = new Array(5);
         let enemyCardFields = new Array(5);
+        let handFields = new Array(5);
 
-        socket.on('receiveCard', (card) => {
-            createCard(card, app.screen.width / 2, app.screen.height - 200);
+        socket.on('receiveCards', async (cards) => {
+            //createCard(card, app.screen.width / 2, app.screen.height - 200);
+            ind = 0;
+            for(let i = 0; i < handFields.length; i++){
+                if(!handFields[i]) {
+                    handFields[i] = await createCard(cards[ind], app.screen.width / 2 + (200 * (i - 2)), app.screen.height - 200);
+                    ind++;
+                }
+            }
         });
-        
-        for(let i = 0; i < 5; i++)
+
+        function getFullHand()
         {
-            socket.emit('getRandCard', null);
+            let needCount = 0;
+            for(let i = 0; i < handFields.length; i++){
+                if(!handFields[i]){
+                    needCount++;
+                }
+            }
+            if(needCount>0){
+                socket.emit('getRandCards', needCount);
+            }
+        
+            
         }
         
-        socket.on('enemyCardPlayed', (card, field) => {
-            const rect = createCard(card, enemyCardFields[field].x, enemyCardFields[field].y);
+        getFullHand();
+        
+        socket.on('enemyCardPlayed', async (card, field) => {
+            const rect = await createCard(card, enemyCardFields[field].x, enemyCardFields[field].y);
             rect.isPlayed = true;
-            enemyCardFields[field].currentCard = card;
+            rect.costText.visible = false;
+            enemyCardFields[field].currentCard = rect;
         });
 
         socket.on('changeTurn', (isMyTurn) => {
             setTurn(isMyTurn);
-        });
-
-        function calculatePoints(currentPoints, baseIncome, amount, incomeRate, maxPoints) {
-            let newPoints = currentPoints + (baseIncome + amount * incomeRate);
-            if (newPoints > maxPoints) {
-                newPoints = maxPoints;
+            if(isMyTurn) {
+                getFullHand();
             }
-        
-            return newPoints;
-        }
-        
+        });
 
         function setTurn(val){
             isMyTurn = val;
@@ -241,7 +258,7 @@ async function loadPlayersData(players, isFirstPlayer) {
         }
         
         async function createCard(card, x, y) {
-            const container = new PIXI.Container();
+            let container = new PIXI.Container();
             app.stage.addChild(container);
     
             container.interactive = true;
@@ -253,15 +270,50 @@ async function loadPlayersData(players, isFirstPlayer) {
             container.zIndex = 1;
             container.card = card;
 
-            container.addChild(spriteInit(await PIXI.Assets.load(card.avatar), 140, 240));
-            container.addChild(spriteInit(heartTex, 30, 30, -50, 100));
-            container.addChild(spriteInit(atkTex, 30, 30, 40, 100));
-            container.addChild(spriteInit(defTex, 30, 30, 0, 100));
+            heart = spriteInit(heartTex, 30, 30, -50, 100);
+            attack = spriteInit(atkTex, 30, 30, 40, 100);
+            console.log('defTest = '+ card.defense);
+            container.addChild(spriteInit(await PIXI.Assets.load(card.avatar), 150, 250));
+            container.addChild(heart);
+            container.addChild(attack);
+            //container.addChild(spriteInit(costTex, 30, 30, 0, 100));
 
-            app.stage.sortChildren();
+            const healthText = createText(heart.position);
+            container.hpText = healthText;
+            container.addChild(healthText);
+
+            const attackText = createText(attack.position);
+            container.atkText = attackText;
+            container.addChild(attackText);
+
+            const costText = createText({x: 0, y: -100});
+            container.costText = costText;
+            container.addChild(costText);
+            updateCardView(container);
             return container;
         }
-    
+
+        function updateCardView(card)
+        {
+            card.hpText.text = card.card.defense;
+            card.atkText.text = card.card.attack;
+            card.costText.text = card.card.cost;
+        }
+        
+        function createText(pos) {
+            const text = new PIXI.Text('0', {
+                fontFamily: 'Arial',
+                fontSize: 20,         
+                fill: 0xffffff,        
+                align: 'center',       
+                stroke: 0x000000,      
+                strokeThickness: 4     
+            });
+            text.anchor.set(0.5);
+            text.position.copyFrom(pos);
+            return text;
+        }
+
         let dragTarget = null;
         let distToPlace = 100;
         distToPlace *= distToPlace;
@@ -303,7 +355,7 @@ async function loadPlayersData(players, isFirstPlayer) {
             
             // Предотвращаем стандартное поведение
             event.stopPropagation();
-            
+            this.costText.visible = false;
             app.stage.on('pointermove', onDragMove);
             startPos = new PIXI.Point();
             dragTarget.position.copyTo(startPos);
@@ -319,14 +371,18 @@ async function loadPlayersData(players, isFirstPlayer) {
                 if (nearest[1] > distToPlace || nearest[0].currentCard) {
                     dragTarget.position.copyFrom(startPos);
                     setPoints(myPoints +dragTarget.card.cost);
+                    dragTarget.costText.visible = true;
                 } else {
                     dragTarget.isPlayed = true;
                     dragTarget.position.copyFrom(nearest[0].position);
                     socket.emit('playCard', dragTarget.card, cardFields.indexOf(nearest[0]));
+                    handFields[handFields.indexOf(dragTarget)] = null;
+                    console.log('index of = ' + dragTarget.card + ' ' + dragTarget.handIndex);
                     nearest[0].currentCard = dragTarget;
                     nearest[0].tint = 0xffffff; // Сбросить оттенок после размещения
                 }
                 
+
                 dragTarget = null;
             }
         }

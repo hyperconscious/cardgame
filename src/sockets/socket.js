@@ -2,6 +2,7 @@ const Room = require('../models/room');
 const Card = require('../models/card');
 const User = require('../models/user');
 const e = require('express');
+const { resume } = require('../../config/db');
 
 module.exports = (io) => {
     let roomsData = {};
@@ -65,8 +66,13 @@ module.exports = (io) => {
             }
         });
 
-        socket.on('getRandCard', async () => {
-            socket.emit('receiveCard', await Card.getRandCard());
+        socket.on('getRandCards', async (count) => {
+            result = new Array(count);
+            for(let i = 0; i < count; i++)
+            {
+                result[i] =  await Card.getRandCard();
+            }
+            socket.emit('receiveCards', result);
         });
 
         socket.on('nextTurn', () => {
@@ -81,8 +87,16 @@ module.exports = (io) => {
                 io.to(room.firstPlayer).emit('changeTurn', true);
                 io.to(room.secondPlayer).emit('changeTurn', false);
                 room.playerTurn = room.firstPlayer;
+
             }
         });
+
+        function battleAction(room) {
+            let dmgToFirstPlayer = 0;
+            let dmgToSecondPlayer = 0;
+
+            //for(let i = 0; i < 5)
+        }
 
         socket.on('disconnecting', async () => {
             const rooms = Array.from(socket.rooms).filter(roomId => roomId !== socket.id);
