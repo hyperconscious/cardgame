@@ -239,7 +239,7 @@ input[type="file"] {
   margin-top: 10px;
 }
 
- .battlelog {
+ #battlelog {
   position: fixed;
   left: 0.5%;
   top: 40%;
@@ -266,6 +266,12 @@ input[type="file"] {
 
 .log-entry:nth-child(odd) {
   background-color: rgba(0, 0, 0, 0.8);
+}
+
+.log-entry .time {
+  color: gray;
+  font-size: 0.9em;
+  margin-right: 5px;
 }
 
 .log-entry .player {
