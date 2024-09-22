@@ -39,7 +39,7 @@ module.exports = (io) => {
                 roomsData[parseInt(roomId)].firstPlayerDeployed = new Array(5);
                 roomsData[parseInt(roomId)].secondPlayerDeployed = new Array(5);
                 roomsData[parseInt(roomId)].secondPlayer = socket.id;
-                
+                roomsData[parseInt(roomId)].secondPlayerHp = 40;
                 
                 io.to(roomsData[parseInt(roomId)].secondPlayer).emit('gameStarted', false, players, !isFirstPlayer);
                 io.to(roomsData[parseInt(roomId)].firstPlayer).emit('gameStarted', true, players, isFirstPlayer);
@@ -47,6 +47,7 @@ module.exports = (io) => {
             }else{
                 roomsData[parseInt(roomId)] = {};
                 roomsData[parseInt(roomId)].firstPlayer = socket.id;
+                roomsData[parseInt(roomId)].firstPlayerHp = 40;
                 roomsData[parseInt(roomId)].playerTurn = socket.id;
             }
         });
@@ -70,7 +71,8 @@ module.exports = (io) => {
             result = new Array(count);
             for(let i = 0; i < count; i++)
             {
-                result[i] =  await Card.getRandCard();
+                result[i] = await Card.getRandCard();
+                console.log(result[i]);
             }
             socket.emit('receiveCards', result);
         });
@@ -87,15 +89,38 @@ module.exports = (io) => {
                 io.to(room.firstPlayer).emit('changeTurn', true);
                 io.to(room.secondPlayer).emit('changeTurn', false);
                 room.playerTurn = room.firstPlayer;
-
+                battleAction(room);
             }
         });
 
+        socket.on('getTurn', () => {
+            io.to(socket.id).emit('changeTurn', roomsData[Array.from(socket.rooms)[1]].playerTurn == socket.id);
+        });
         function battleAction(room) {
-            let dmgToFirstPlayer = 0;
-            let dmgToSecondPlayer = 0;
+            for(let i = 0; i < 5; i++)
+            {
+                if(room.firstPlayerDeployed[i] && !room.secondPlayerDeployed[i])
+                    room.secondPlayerHp -= room.firstPlayerDeployed[i].attack;
+                if(!room.firstPlayerDeployed[i] && room.secondPlayerDeployed[i])
+                    room.firstPlayerHp -= room.secondPlayerDeployed[i].attack;
+                if(room.firstPlayerDeployed[i] && room.secondPlayerDeployed[i]) {
+                    room.firstPlayerDeployed[i].defense -= room.secondPlayerDeployed[i].attack;
+                    room.secondPlayerDeployed[i].defense -= room.firstPlayerDeployed[i].attack;
+                    if(room.firstPlayerDeployed[i].defense <= 0) room.firstPlayerDeployed[i] = null;
+                    if(room.secondPlayerDeployed[i].defense <= 0) room.secondPlayerDeployed[i] = null;
+                }
+            }
+            io.to(room.firstPlayer).emit('updateBattleField', 
+                room.firstPlayerHp, 
+                room.secondPlayerHp, 
+                room.firstPlayerDeployed,
+                room.secondPlayerDeployed);
 
-            //for(let i = 0; i < 5)
+            io.to(room.secondPlayer).emit('updateBattleField',  
+                room.secondPlayerHp, 
+                room.firstPlayerHp,
+                room.secondPlayerDeployed, 
+                room.firstPlayerDeployed);
         }
 
         socket.on('disconnecting', async () => {
