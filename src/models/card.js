@@ -6,7 +6,7 @@ class Card {
         this.character_name = character_name;
         this.avatar = avatar;
         this.attack = attack;
-        this.defence = defense;
+        this.defense = defense;
         this.cost = cost;
     }
 
