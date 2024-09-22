@@ -152,6 +152,7 @@ async function loadPlayersData(players, isFirstPlayer) {
             //createCard(card, app.screen.width / 2, app.screen.height - 200);
             ind = 0;
             for(let i = 0; i < handFields.length; i++){
+                console.log('handfields[i] : ', handFields[i]);
                 if(!handFields[i]) {
                     console.log('Creating card:', cards[ind]);
                     handFields[i] = await createCard(cards[ind], app.screen.width / 2 + (200 * (i - 2)), app.screen.height - 200);
@@ -225,7 +226,7 @@ async function loadPlayersData(players, isFirstPlayer) {
                 newPoints =maxPoints;
             }
 
-            return newPoints;
+            return Math.ceil(newPoints);
         }
 
         function setTurn(val){
