@@ -1,1 +1,0 @@
-const output = document.querySelector('#outputlog');

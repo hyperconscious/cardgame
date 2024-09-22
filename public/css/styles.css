@@ -239,33 +239,39 @@ input[type="file"] {
   margin-top: 10px;
 }
 
-.battlelog {
-  position: absolute;
+ .battlelog {
+  position: fixed;
   left: 0.5%;
   top: 40%;
-  display: inline-flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  width: 340px;
+  height: 200px;
+  overflow-y: scroll;
   transform: translate(0, -10%);
+  border-radius: 10px;
+  padding: 10px;
   box-shadow: 0 4px 8px rgba(252, 249, 255, 0.1);
 }
 
 .log {
-  color: #315269;
-  padding: 15px;
-  margin: 7px;
-  background-color: rgba(245, 226, 255, 0.233);
+  color: #fff;
+  font-size: 14px;
 }
 
-.log textarea {
+.log-entry {
+  padding: 8px;
+  margin-bottom: 5px;
+  background-color: rgba(0, 0, 0, 0.5);
   border-radius: 5px;
-  font-size: 17px;
-  background: white;
-  color: black;
 }
 
-.log p {
-  font-size: 22px;
-  color: black;
+.log-entry:nth-child(odd) {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.log-entry .player {
+  color: #4caf50;
+}
+
+.log-entry .enemy {
+  color: #f44336;
 }

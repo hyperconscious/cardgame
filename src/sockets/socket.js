@@ -13,7 +13,7 @@ module.exports = (io) => {
 
         socket.on('joinRoom', async (roomId) => {
             socket.join(roomId);
-            console.log(`Player ${socket.id} joined room ${roomId}`);
+            console.log(`Player ${socket.id} joined the room ${roomId}`);
             const room = await Room.findById(roomId);
             if(!room) return;
             

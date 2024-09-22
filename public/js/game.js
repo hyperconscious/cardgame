@@ -1,3 +1,4 @@
+const battleLog = document.querySelector('.log');
 
 class Card {
     constructor({id, character_name, avatar, attack, defense, cost}) {
@@ -8,6 +9,23 @@ class Card {
         this.defense = defense;
         this.cost = cost;
     }
+}
+
+function addLogEntry(battleLog, text, type) {
+    const entry = document.createElement('div');
+    entry.classList.add('log-entry');
+
+    if (type === 'player') {
+        entry.innerHTML = `<span class="player">Player: </span>${text}`;
+    } else if (type === 'enemy') {
+        entry.innerHTML = `<span class="enemy">Enemy: </span>${text}`;
+    } else {
+        entry.innerHTML = text;
+    }
+
+    battleLog.appendChild(entry);
+
+    battleLog.scrollTop = battleLog.scrollHeight;
 }
 
 function updatePlayerInfo(hp) {
@@ -41,6 +59,8 @@ async function loadPlayersData(players, isFirstPlayer) {
 
 (async () => {
     const socket = io();
+    let playerHealth = 40;
+    let enemyHealth = 40;
 
     const roomId = new URLSearchParams(window.location.search).get('roomId');
 
@@ -61,14 +81,18 @@ async function loadPlayersData(players, isFirstPlayer) {
         document.getElementById('player-container').style.display = 'flex';
         document.getElementById('enemy-container').style.display = 'flex';
 
+        addLogEntry(battleLog, `${isFirstPlayer ? players.user.name : players.enemy.name} joined the room`);
+        addLogEntry(battleLog, `${isFirstPlayer ? players.enemy.name : players.user.name} joined the room`);
+
         myPoints = 10;
         await loadPlayersData(players, isFirstPlayer);
-        updateEnemyInfo(40);
-        updatePlayerInfo(40);
+        updateEnemyInfo(enemyHealth);
+        updatePlayerInfo(playerHealth);
 
         socket.emit('getRandCard', null);
 
         socket.emit('getTurn');
+        
         
         // Append the application canvas to the document body
         document.body.appendChild(app.view);
@@ -230,8 +254,14 @@ async function loadPlayersData(players, isFirstPlayer) {
         });
 
         socket.on('updateBattleField', (playerHp, enemyHp, myCardsOnField, enemyCardsOnField) => {
+            
             updatePlayerInfo(playerHp);
             updateEnemyInfo(enemyHp);
+            addLogEntry(battleLog, `You dealt ${enemyHealth - enemyHp} damage to the enemy`, 'player');
+            addLogEntry(battleLog, `You took ${playerHealth - playerhHp} damage`, 'enemy');
+            playerHealth = playerHp;
+            enemyHealth = enemyHp;
+
             for(let i = 0; i < cardFields.length; i++)
             {
                 console.log('i = ' + i + ' ' + myCardsOnField);
@@ -269,6 +299,8 @@ async function loadPlayersData(players, isFirstPlayer) {
             basicText.text = val ? 'Your turn' : 'Not your turn\n just wait(';
             if(!val) {
                 setPoints(calculatePoints(myPoints, 3, (myPoints / 5), 3, 24));
+            } else {
+                addLogEntry(battleLog, `Your turn!`);
             }
         }
 
