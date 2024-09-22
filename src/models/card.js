@@ -1,12 +1,12 @@
 const db = require('../../config/db');
 
 class Card {
-    constructor({id, character_name, avatar, attack, defence, cost}) {
+    constructor({id, character_name, avatar, attack, defense, cost}) {
         this.id = id;
         this.character_name = character_name;
         this.avatar = avatar;
         this.attack = attack;
-        this.defence = defence;
+        this.defence = defense;
         this.cost = cost;
     }
 
