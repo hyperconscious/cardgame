@@ -16,9 +16,11 @@ module.exports = (io) => {
             console.log(`Player ${socket.id} joined the room ${roomId}`);
             const room = await Room.findById(roomId);
             if(!room) return;
+            socket.userId = room.player1_id; 
             
             if (room.isFull()) {
                 console.log('full');
+                socket.userId = room.player2_id; 
                 const user = await User.findById(room.player2_id);
                 const enemy = await User.findById(room.player1_id);
 
