@@ -240,7 +240,8 @@ async function loadPlayersData(players, isFirstPlayer) {
             }
         });
 
-
+        
+        let timeLeft = 30;
         socket.on('win', () => {
             changeGameState('you win');
         });
@@ -297,6 +298,7 @@ async function loadPlayersData(players, isFirstPlayer) {
         function setTurn(val){
             isMyTurn = val;
             basicText.text = val ? 'Your turn' : 'Not your turn\n just wait(';
+            timeLeft = 30;
             if(!val) {
                 setPoints(calculatePoints(myPoints, 3, (myPoints / 5), 3, 24));
             } else {
@@ -351,6 +353,22 @@ async function loadPlayersData(players, isFirstPlayer) {
             if(!isMyTurn || !isGame) return;
             socket.emit('nextTurn');
         }
+
+        const countdownText = new PIXI.Text(`Time: ${timeLeft}`, {fontSize: 36, fill: '#ffffff'});
+        countdownText.x = app.screen.width / 2;
+        countdownText.y = 20;
+        app.stage.addChild(countdownText);
+
+        // Set up a timer that counts down every second
+        const countdownInterval = setInterval(() => {
+            if(timeLeft <= 0) return;
+            timeLeft--;
+            countdownText.text = `Time: ${timeLeft}`;
+
+            if (timeLeft <= 0) {
+                nextTurn();
+            }
+        }, 1000);
     
         function spriteInit(    tex, width = 100, height = 100, x = 0, y = 0) {
             const obj = new PIXI.Sprite(tex);

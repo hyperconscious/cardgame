@@ -159,7 +159,6 @@ module.exports = (io) => {
             }
         });
 
-        
 
         socket.on('disconnect', async () => {
             console.log('Player disconnected:', socket.id);
