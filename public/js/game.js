@@ -286,7 +286,7 @@ async function loadPlayersData(players, isFirstPlayer) {
             socket.emit('nextTurn');
         }
     
-        function spriteInit(tex, width = 100, height = 100, x = 0, y = 0) {
+        function spriteInit(    tex, width = 100, height = 100, x = 0, y = 0) {
             const obj = new PIXI.Sprite(tex);
             obj.anchor.set(0.5);
             obj.width = width;
