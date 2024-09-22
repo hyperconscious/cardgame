@@ -109,7 +109,7 @@ async function loadPlayersData(players, isFirstPlayer) {
         pointsText.y = app.screen.height - 200;
         app.stage.addChild(pointsText);
         isMyTurn = isTurn;
-        setTurn(isMyTurn);
+        basicText.text = isTurn ? 'Your turn' : 'Not your turn\n just wait(';
 
         button = new PIXI.Sprite(buttonTex);
         button.width = 120;
@@ -224,7 +224,7 @@ async function loadPlayersData(players, isFirstPlayer) {
             let newPoints = currentPoints + income + incomeRate * level;
 
             if (newPoints > maxPoints) {
-                newPoints =maxPoints;
+                newPoints = maxPoints;
             }
 
             return Math.ceil(newPoints);
@@ -232,10 +232,9 @@ async function loadPlayersData(players, isFirstPlayer) {
 
         function setTurn(val){
             isMyTurn = val;
-            console.log('yey ' + val);
             basicText.text = val ? 'Your turn' : 'Not your turn\n just wait(';
             if(!val){
-                myPoints = calculatePoints(myPoints, 3, (myPoints / 5), 3, 24);
+                setPoints(calculatePoints(myPoints, 3, (myPoints / 5), 3, 24));
             }
         }
 

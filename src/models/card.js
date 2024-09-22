@@ -24,7 +24,9 @@ class Card {
     static async getRandCard() {
         try {
             const [rows] = await db.query('SELECT id, character_name, avatar, attack, defense, cost FROM cards ORDER BY RAND() LIMIT 1');
-            return rows[0];
+            let card = new Card(rows[0]);
+            console.log(card.avatar);
+            return card;
         } catch (error) {
             console.error('Error finding random card:', error);
             throw error;
