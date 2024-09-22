@@ -11,16 +11,25 @@ class Card {
     }
 }
 
+function getCurrentTime() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+}
+
 function addLogEntry(battleLog, text, type) {
+    const time = getCurrentTime();
     const entry = document.createElement('div');
     entry.classList.add('log-entry');
 
     if (type === 'player') {
-        entry.innerHTML = `<span class="player">Player: </span>${text}`;
+        entry.innerHTML = `<span class="time">[${time}]</span> <span class="player">Player: </span>${text}`;
     } else if (type === 'enemy') {
-        entry.innerHTML = `<span class="enemy">Enemy: </span>${text}`;
+        entry.innerHTML = `<span class="time">[${time}]</span> <span class="enemy">Enemy: </span>${text}`;
     } else {
-        entry.innerHTML = text;
+        entry.innerHTML = `<span class="time">[${time}]</span> ${text}`;
     }
 
     battleLog.appendChild(entry);
@@ -61,6 +70,7 @@ async function loadPlayersData(players, isFirstPlayer) {
     const socket = io();
     let playerHealth = 40;
     let enemyHealth = 40;
+    let isFirst = false;
 
     const roomId = new URLSearchParams(window.location.search).get('roomId');
 
@@ -76,16 +86,18 @@ async function loadPlayersData(players, isFirstPlayer) {
     });
 
     socket.on('gameStarted', async (isTurn, players, isFirstPlayer) => {
+        isFirst = isFirstPlayer;
         document.getElementById('info').style.display = 'none';
         document.getElementById('status').style.display = 'none';
         document.getElementById('player-container').style.display = 'flex';
         document.getElementById('enemy-container').style.display = 'flex';
+        document.getElementById('battlelog').style.display = 'flex';
 
-        addLogEntry(battleLog, `${isFirstPlayer ? players.user.name : players.enemy.name} joined the room`);
-        addLogEntry(battleLog, `${isFirstPlayer ? players.enemy.name : players.user.name} joined the room`);
+        addLogEntry(battleLog, `${isFirst ? players.user.name : players.enemy.name} joined the room`);
+        addLogEntry(battleLog, `${isFirst ? players.enemy.name : players.user.name} joined the room`);
 
         myPoints = 10;
-        await loadPlayersData(players, isFirstPlayer);
+        await loadPlayersData(players, isFirst);
         updateEnemyInfo(enemyHealth);
         updatePlayerInfo(playerHealth);
 
@@ -222,11 +234,16 @@ async function loadPlayersData(players, isFirstPlayer) {
         });
 
         socket.on('updateBattleField', (playerHp, enemyHp, myCardsOnField, enemyCardsOnField) => {
-            
             updatePlayerInfo(playerHp);
             updateEnemyInfo(enemyHp);
-            addLogEntry(battleLog, `You dealt ${enemyHealth - enemyHp} damage to the enemy`, 'player');
-            addLogEntry(battleLog, `You took ${playerHealth - playerhHp} damage`, 'enemy');
+            dealtDamage = enemyHealth - enemyHp;
+            receivedDamage = playerHealth - playerHp;
+            if (dealtDamage !== 0) {
+                addLogEntry(battleLog, `You dealt ${dealtDamage} damage to the enemy`, 'player');
+            }
+            if (receivedDamage !== 0) {
+                addLogEntry(battleLog, `Dealt to you ${receivedDamage} damage`, 'enemy');
+            }
             playerHealth = playerHp;
             enemyHealth = enemyHp;
 
@@ -266,7 +283,7 @@ async function loadPlayersData(players, isFirstPlayer) {
             isMyTurn = val;
             basicText.text = val ? 'Your turn' : 'Not your turn\n just wait(';
             if(!val){
-                setPoints(calculatePoints(myPoints, 3, (myPoints / 5), 3, 24));
+                setPoints(calculatePoints(myPoints, 4, (myPoints / 5), 3, 24));
             } else {
                 addLogEntry(battleLog, `Your turn!`);
             }
