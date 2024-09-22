@@ -165,6 +165,7 @@ async function loadPlayersData(players, isFirstPlayer) {
             button.tint = 0xffffff; 
         });
         app.stage.addChild(button);
+        let timeLeft = 30;
 
         const nextTurnText = new PIXI.Text('Next turn', {
             fontFamily: 'Arial',
@@ -216,7 +217,7 @@ async function loadPlayersData(players, isFirstPlayer) {
         
             
         }
-
+        const countdownText = new PIXI.Text(`Time: ${timeLeft}`, {fontSize: 36, fill: '#ffffff'});
         function changeGameState(state)
         {
             isGame = false;
@@ -232,6 +233,7 @@ async function loadPlayersData(players, isFirstPlayer) {
             text.y = 100;
             text.x = app.screen.width/2;
             app.stage.addChild(text);
+            countdownText.visible = false;
         }
         
         getFullHand();
@@ -252,21 +254,22 @@ async function loadPlayersData(players, isFirstPlayer) {
         });
 
         
-        let timeLeft = 30;
+        
         socket.on('win', () => {
-            changeGameState('you win');
+            changeGameState('Game ended');
             addLogEntry(battleLog, `You win!`, 'player');
         });
 
         socket.on('lose', () => {
-            changeGameState('you lose');
+            changeGameState('Game ended');
             addLogEntry(battleLog, `You lose!`, 'player');
         });
 
         socket.on('draw', () => {
-            changeGameState('draw');
+            changeGameState('Game ended');
             addLogEntry(battleLog, `draw`);
         });
+
 
         socket.on('updateBattleField', (playerHp, enemyHp, myCardsOnField, enemyCardsOnField) => {
             updatePlayerInfo(playerHp);
@@ -284,14 +287,12 @@ async function loadPlayersData(players, isFirstPlayer) {
 
             for(let i = 0; i < cardFields.length; i++)
             {
-                console.log('i = ' + i + ' ' + myCardsOnField);
                 if(cardFields[i].currentCard)
                     if(!myCardsOnField[i]) {
                         cardFields[i].currentCard.destroy();
                         cardFields[i].currentCard = null;
                     } else {
                         cardFields[i].currentCard.card = myCardsOnField[i];
-                        console.log(myCardsOnField[i].defense);
                         updateCardView(cardFields[i].currentCard);
                     }
                 if(enemyCardFields[i].currentCard)
@@ -373,14 +374,14 @@ async function loadPlayersData(players, isFirstPlayer) {
             socket.emit('nextTurn');
         }
 
-        const countdownText = new PIXI.Text(`Time: ${timeLeft}`, {fontSize: 36, fill: '#ffffff'});
+        
         countdownText.x = app.screen.width / 2;
         countdownText.y = 20;
         app.stage.addChild(countdownText);
 
         // Set up a timer that counts down every second
         const countdownInterval = setInterval(() => {
-            if(timeLeft <= 0) return;
+            if(timeLeft <= 0 || !isGame) return;
             timeLeft--;
             countdownText.text = `Time: ${timeLeft}`;
 
@@ -426,7 +427,6 @@ async function loadPlayersData(players, isFirstPlayer) {
             attack = spriteInit(atkTex, 30, 30, 40, 100);
             heart.zIndex = 0;
         
-            console.log('card: ', card.avatar);
             avatar = await PIXI.Assets.load(String(card.avatar));
             container.addChild(spriteInit(avatar, 150, 250));
             container.addChild(heart);
@@ -534,7 +534,6 @@ async function loadPlayersData(players, isFirstPlayer) {
                     dragTarget.position.copyFrom(nearest[0].position);
                     socket.emit('playCard', dragTarget.card, cardFields.indexOf(nearest[0]));
                     handFields[handFields.indexOf(dragTarget)] = null;
-                    console.log('index of = ' + dragTarget.card + ' ' + dragTarget.handIndex);
                     nearest[0].currentCard = dragTarget;
                     nearest[0].tint = 0xffffff; // Сбросить оттенок после размещения
                 }
