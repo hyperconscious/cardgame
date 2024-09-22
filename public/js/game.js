@@ -258,7 +258,7 @@ async function loadPlayersData(players, isFirstPlayer) {
             updatePlayerInfo(playerHp);
             updateEnemyInfo(enemyHp);
             addLogEntry(battleLog, `You dealt ${enemyHealth - enemyHp} damage to the enemy`, 'player');
-            addLogEntry(battleLog, `You took ${playerHealth - playerhHp} damage`, 'enemy');
+            addLogEntry(battleLog, `You took ${playerHealth - playerHp} damage`, 'enemy');
             playerHealth = playerHp;
             enemyHealth = enemyHp;
 
