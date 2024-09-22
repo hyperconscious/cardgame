@@ -151,13 +151,18 @@ async function loadPlayersData(players, isFirstPlayer) {
         socket.on('receiveCards', async (cards) => {
             //createCard(card, app.screen.width / 2, app.screen.height - 200);
             ind = 0;
-            for(let i = 0; i < handFields.length; i++){
+            let isBug = false;
+            for(let i = 0; i < handFields.length; i++) {
+                
+
                 if(!handFields[i]) {
                     handFields[i] = await createCard(cards[ind], app.screen.width / 2 + (200 * (i - 2)), app.screen.height - 200);
+                    if(!handFields[i]) isBug = true;
                     ind++;
                 }
                 
             }
+            if(isBug) getFullHand();
         });
 
         function getFullHand()
