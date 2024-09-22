@@ -215,7 +215,6 @@ async function loadPlayersData(players, isFirstPlayer) {
                         enemyCardFields[i].currentCard.card = enemyCardsOnField[i];
                         updateCardView(enemyCardFields[i].currentCard);
                     }
-                
             }
         });
 
