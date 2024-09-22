@@ -21,7 +21,7 @@ module.exports = (io) => {
                 const user = await User.findById(room.player2_id);
                 const enemy = await User.findById(room.player1_id);
 
-                players = {
+                const players = {
                     user: {
                         id: user.id,
                         name: user.login
@@ -29,9 +29,9 @@ module.exports = (io) => {
                     enemy: {
                         id: enemy.id,
                         name: enemy.login
-                    },
-                    isFirstPlayer: socket.userId === room.player1_id
+                    }
                 };
+                const isFirstPlayer = socket.userId === room.player1_id;
 
                 roomsData[parseInt(roomId)].firstPlayerCards = new Array(5);
                 roomsData[parseInt(roomId)].secondPlayerCards = new Array(5);
@@ -40,8 +40,8 @@ module.exports = (io) => {
                 roomsData[parseInt(roomId)].secondPlayer = socket.id;
                 
                 
-                io.to(roomsData[parseInt(roomId)].secondPlayer).emit('gameStarted', false, players);
-                io.to(roomsData[parseInt(roomId)].firstPlayer).emit('gameStarted', true, players);
+                io.to(roomsData[parseInt(roomId)].secondPlayer).emit('gameStarted', false, players, !isFirstPlayer);
+                io.to(roomsData[parseInt(roomId)].firstPlayer).emit('gameStarted', true, players, isFirstPlayer);
                 
             }else{
                 roomsData[parseInt(roomId)] = {};
