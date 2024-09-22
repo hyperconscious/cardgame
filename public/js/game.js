@@ -165,6 +165,7 @@ async function loadPlayersData(players, isFirstPlayer) {
             button.tint = 0xffffff; 
         });
         app.stage.addChild(button);
+        let timeLeft = 30;
 
         const nextTurnText = new PIXI.Text('Next turn', {
             fontFamily: 'Arial',
@@ -216,7 +217,7 @@ async function loadPlayersData(players, isFirstPlayer) {
         
             
         }
-
+        const countdownText = new PIXI.Text(`Time: ${timeLeft}`, {fontSize: 36, fill: '#ffffff'});
         function changeGameState(state)
         {
             isGame = false;
@@ -232,7 +233,7 @@ async function loadPlayersData(players, isFirstPlayer) {
             text.y = 100;
             text.x = app.screen.width/2;
             app.stage.addChild(text);
-
+            countdownText.visible = false;
         }
         
         getFullHand();
@@ -253,17 +254,17 @@ async function loadPlayersData(players, isFirstPlayer) {
         });
 
         
-        let timeLeft = 30;
+        
         socket.on('win', () => {
-            changeGameState('you win');
+            changeGameState('Game ended');
         });
 
         socket.on('lose', () => {
-            changeGameState('you lose');
+            changeGameState('Game ended');
         });
 
         socket.on('draw', () => {
-            changeGameState('draw');
+            changeGameState('Game ended');
         });
 
         socket.on('updateBattleField', (playerHp, enemyHp, myCardsOnField, enemyCardsOnField) => {
@@ -371,14 +372,14 @@ async function loadPlayersData(players, isFirstPlayer) {
             socket.emit('nextTurn');
         }
 
-        const countdownText = new PIXI.Text(`Time: ${timeLeft}`, {fontSize: 36, fill: '#ffffff'});
+        
         countdownText.x = app.screen.width / 2;
         countdownText.y = 20;
         app.stage.addChild(countdownText);
 
         // Set up a timer that counts down every second
         const countdownInterval = setInterval(() => {
-            if(timeLeft <= 0) return;
+            if(timeLeft <= 0 || !isGame) return;
             timeLeft--;
             countdownText.text = `Time: ${timeLeft}`;
 
