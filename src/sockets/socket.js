@@ -73,7 +73,6 @@ module.exports = (io) => {
             {
                 result[i] = await Card.getRandCard();
                 if(!result[i]) i--; 
-                else console.log(result[i].avatar, result[i].character_name);
             }
             socket.emit('receiveCards', result);
         });

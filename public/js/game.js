@@ -287,14 +287,12 @@ async function loadPlayersData(players, isFirstPlayer) {
 
             for(let i = 0; i < cardFields.length; i++)
             {
-                console.log('i = ' + i + ' ' + myCardsOnField);
                 if(cardFields[i].currentCard)
                     if(!myCardsOnField[i]) {
                         cardFields[i].currentCard.destroy();
                         cardFields[i].currentCard = null;
                     } else {
                         cardFields[i].currentCard.card = myCardsOnField[i];
-                        console.log(myCardsOnField[i].defense);
                         updateCardView(cardFields[i].currentCard);
                     }
                 if(enemyCardFields[i].currentCard)
@@ -429,7 +427,6 @@ async function loadPlayersData(players, isFirstPlayer) {
             attack = spriteInit(atkTex, 30, 30, 40, 100);
             heart.zIndex = 0;
         
-            console.log('card: ', card.avatar);
             avatar = await PIXI.Assets.load(String(card.avatar));
             container.addChild(spriteInit(avatar, 150, 250));
             container.addChild(heart);
@@ -537,7 +534,6 @@ async function loadPlayersData(players, isFirstPlayer) {
                     dragTarget.position.copyFrom(nearest[0].position);
                     socket.emit('playCard', dragTarget.card, cardFields.indexOf(nearest[0]));
                     handFields[handFields.indexOf(dragTarget)] = null;
-                    console.log('index of = ' + dragTarget.card + ' ' + dragTarget.handIndex);
                     nearest[0].currentCard = dragTarget;
                     nearest[0].tint = 0xffffff; // Сбросить оттенок после размещения
                 }
