@@ -21,6 +21,16 @@ class User extends Model {
         }
     }
 
+    static async findById(id) {
+        try {
+            const [rows] = await db.query(`SELECT * FROM ${this.tableName} WHERE id = ?`, [id]);
+            return rows.length > 0 ? new this(rows[0]) : null;
+        } catch (error) {
+            console.error('Error finding user by id:', error);
+            throw error;
+        }
+    }
+
     static async findByEmail(email) {
         try {
             const [rows] = await db.query(`SELECT * FROM ${this.tableName} WHERE email = ?`, [email]);

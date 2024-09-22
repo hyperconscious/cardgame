@@ -47,8 +47,7 @@ const uploadAvatar = (req, res) => {
 };
 
 const getUserAvatar = async (req, res) => {
-
-    const userId = req.session.user.id;
+    const userId = req.params.userId === undefined ? req.session.user.id : req.params.userId ;
 
     try {
         const [user] = await db.query('SELECT avatar FROM users WHERE id = ?', [userId]);

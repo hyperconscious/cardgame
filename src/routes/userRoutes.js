@@ -31,8 +31,4 @@ router.get('/home', (req, res) => {
     });
 });
 
-router.post('/upload-avatar', avatarController.uploadAvatar);
-
-router.get('/user-avatar', avatarController.getUserAvatar);
-
 module.exports = router;

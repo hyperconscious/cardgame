@@ -11,7 +11,7 @@
 <body>
   <div class="container">
     <h1 id="welcome">Welcome, %LOGIN%!</h1>
-    <form id="avatarForm" enctype="multipart/form-data" method="POST" action="/upload-avatar">
+    <form id="avatarForm" enctype="multipart/form-data" method="POST" action="/api/upload-avatar">
       <input type="file" name="avatarInput" accept="image/*" required>
       <button type="submit">Upload Avatar</button>
     </form>
@@ -25,7 +25,7 @@
   <script src="/js/uploadAvatar.js"></script>
   <script>
     window.onload = function () {
-      fetch('../user/user-avatar')
+      fetch('/api/user-avatar')
         .then(response => response.json())
         .then(data => {
           const avatarSrc = data.avatar ? data.avatar : '/images/default-avatar.png';

@@ -1,9 +1,11 @@
 const Room = require('../models/room');
 const Card = require('../models/card');
+const User = require('../models/user');
 const e = require('express');
 
 module.exports = (io) => {
     let roomsData = {};
+    let players = {};
     io.on('connection', (socket) => {
 
         console.log('Player connected:', socket.id);
@@ -12,10 +14,25 @@ module.exports = (io) => {
             socket.join(roomId);
             console.log(`Player ${socket.id} joined room ${roomId}`);
             const room = await Room.findById(roomId);
-            socket.userId = room.player1_id; 
+            if(!room) return;
+            
             if (room.isFull()) {
-                socket.userId = room.player2_id; 
-                
+                console.log('full');
+                const user = await User.findById(room.player2_id);
+                const enemy = await User.findById(room.player1_id);
+
+                players = {
+                    user: {
+                        id: user.id,
+                        name: user.login
+                    },
+                    enemy: {
+                        id: enemy.id,
+                        name: enemy.login
+                    },
+                    isFirstPlayer: false
+                };
+
                 roomsData[parseInt(roomId)].firstPlayerCards = new Array(5);
                 roomsData[parseInt(roomId)].secondPlayerCards = new Array(5);
                 roomsData[parseInt(roomId)].firstPlayerDeployed = new Array(5);
@@ -23,9 +40,9 @@ module.exports = (io) => {
                 roomsData[parseInt(roomId)].secondPlayer = socket.id;
                 
                 
-                io.to(roomsData[parseInt(roomId)].secondPlayer).emit('gameStarted', false);
-                io.to(roomsData[parseInt(roomId)].firstPlayer).emit('gameStarted', true);
-
+                io.to(roomsData[parseInt(roomId)].secondPlayer).emit('gameStarted', false, players);
+                io.to(roomsData[parseInt(roomId)].firstPlayer).emit('gameStarted', true, players);
+                
             }else{
                 roomsData[parseInt(roomId)] = {};
                 roomsData[parseInt(roomId)].firstPlayer = socket.id;
