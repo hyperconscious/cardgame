@@ -257,15 +257,19 @@ async function loadPlayersData(players, isFirstPlayer) {
         
         socket.on('win', () => {
             changeGameState('Game ended');
+            addLogEntry(battleLog, `You win!`, 'player');
         });
 
         socket.on('lose', () => {
             changeGameState('Game ended');
+            addLogEntry(battleLog, `You lose!`, 'player');
         });
 
         socket.on('draw', () => {
             changeGameState('Game ended');
+            addLogEntry(battleLog, `draw`);
         });
+
 
         socket.on('updateBattleField', (playerHp, enemyHp, myCardsOnField, enemyCardsOnField) => {
             updatePlayerInfo(playerHp);
