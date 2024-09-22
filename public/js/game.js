@@ -1,12 +1,12 @@
 const battleLog = document.querySelector('.log');
 
 class Card {
-    constructor({id, character_name, avatar, attack, defence, cost}) {
+    constructor({id, character_name, avatar, attack, defense, cost}) {
         this.id = id;
         this.character_name = character_name;
         this.avatar = avatar;
         this.attack = attack;
-        this.defence = defence;
+        this.defense = defense;
         this.cost = cost;
     }
 }
@@ -133,7 +133,7 @@ async function loadPlayersData(players, isFirstPlayer) {
         pointsText.y = app.screen.height - 200;
         app.stage.addChild(pointsText);
         isMyTurn = isTurn;
-        setTurn(isMyTurn);
+        basicText.text = isTurn ? 'Your turn' : 'Not your turn\n just wait(';
 
         button = new PIXI.Sprite(buttonTex);
         button.width = 120;
@@ -175,15 +175,18 @@ async function loadPlayersData(players, isFirstPlayer) {
         socket.on('receiveCards', async (cards) => {
             //createCard(card, app.screen.width / 2, app.screen.height - 200);
             ind = 0;
-            for(let i = 0; i < handFields.length; i++){
-                console.log('handfields[i] : ', handFields[i]);
+            let isBug = false;
+            for(let i = 0; i < handFields.length; i++) {
+                
+
                 if(!handFields[i]) {
-                    console.log('Creating card:', cards[ind], cards[ind].character_name);
                     handFields[i] = await createCard(cards[ind], app.screen.width / 2 + (200 * (i - 2)), app.screen.height - 200);
+                    if(!handFields[i]) isBug = true;
                     ind++;
                 }
                 
             }
+            if(isBug) getFullHand();
         });
 
         function getFullHand()
@@ -253,7 +256,7 @@ async function loadPlayersData(players, isFirstPlayer) {
             let newPoints = currentPoints + income + incomeRate * level;
 
             if (newPoints > maxPoints) {
-                newPoints =maxPoints;
+                newPoints = maxPoints;
             }
 
             return Math.ceil(newPoints);
@@ -261,10 +264,9 @@ async function loadPlayersData(players, isFirstPlayer) {
 
         function setTurn(val){
             isMyTurn = val;
-            console.log('yey ' + val);
             basicText.text = val ? 'Your turn' : 'Not your turn\n just wait(';
-            if(!val) {
-                myPoints = calculatePoints(myPoints, 3, (myPoints / 5), 3, 24);
+            if(!val){
+                setPoints(calculatePoints(myPoints, 3, (myPoints / 5), 3, 24));
             } else {
                 addLogEntry(battleLog, `Your turn!`);
             }
@@ -330,42 +332,55 @@ async function loadPlayersData(players, isFirstPlayer) {
         }
         
         async function createCard(card, x, y) {
+            if (!card) {
+                console.error("Card is null or undefined");
+                return;
+            }
+        
+            if (!card.avatar) {
+                console.error("Card avatar is null or undefined");
+                return;
+            }
+        
             let container = new PIXI.Container();
             app.stage.addChild(container);
-    
+        
             container.interactive = true;
             container.on('pointerdown', onDragStart);
-    
+        
             container.isPlayed = false;
             container.x = x;
             container.y = y;
             container.zIndex = 1;
             container.card = card;
-
+        
             heart = spriteInit(heartTex, 30, 30, -50, 100);
             attack = spriteInit(atkTex, 30, 30, 40, 100);
-
+            heart.zIndex = 0;
+        
             console.log('card: ', card.avatar);
             avatar = await PIXI.Assets.load(String(card.avatar));
             container.addChild(spriteInit(avatar, 150, 250));
             container.addChild(heart);
             container.addChild(attack);
-            //container.addChild(spriteInit(costTex, 30, 30, 0, 100));
-
+        
             const healthText = createText(heart.position);
+            healthText.zIndex = 1;
             container.hpText = healthText;
             container.addChild(healthText);
-
+        
             const attackText = createText(attack.position);
             container.atkText = attackText;
             container.addChild(attackText);
-
-            const costText = createText({x: 0, y: -100});
+        
+            const costText = createText({ x: 0, y: -100 });
             container.costText = costText;
             container.addChild(costText);
             updateCardView(container);
+        
             return container;
         }
+        
 
         function updateCardView(card)
         {
