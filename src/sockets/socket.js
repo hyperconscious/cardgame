@@ -11,7 +11,6 @@ module.exports = (io) => {
         socket.on('joinRoom', async (roomId) => {
             socket.join(roomId);
             console.log(`Player ${socket.id} joined room ${roomId}`);
-
             const room = await Room.findById(roomId);
             socket.userId = room.player1_id; 
             if (room.isFull()) {
@@ -21,19 +20,21 @@ module.exports = (io) => {
                 roomsData[parseInt(roomId)].secondPlayerCards = new Array(5);
                 roomsData[parseInt(roomId)].firstPlayerDeployed = new Array(5);
                 roomsData[parseInt(roomId)].secondPlayerDeployed = new Array(5);
-                roomsData[parseInt(roomId)].secondPlayer = socket.id
+                roomsData[parseInt(roomId)].secondPlayer = socket.id;
                 
                 
-                io.to(roomId).emit('gameStarted');
-                
+                io.to(roomsData[parseInt(roomId)].secondPlayer).emit('gameStarted', false);
+                io.to(roomsData[parseInt(roomId)].firstPlayer).emit('gameStarted', true);
+
             }else{
                 roomsData[parseInt(roomId)] = {};
                 roomsData[parseInt(roomId)].firstPlayer = socket.id;
+                roomsData[parseInt(roomId)].playerTurn = socket.id;
             }
         });
 
         socket.on('playCard', (card, field) => {
-            console.log('field ' + field);
+            
             let room = roomsData[Array.from(socket.rooms)[1]];
             if(room.firstPlayer == socket.id)
             {
@@ -44,6 +45,25 @@ module.exports = (io) => {
             {
                 io.to(room.firstPlayer).emit('enemyCardPlayed', card, field);
                 room.secondPlayerDeployed[field] = card;
+            }
+        });
+
+        socket.on('getRandCard', async () => {
+            socket.emit('receiveCard', await Card.getRandCard());
+        });
+
+        socket.on('nextTurn', () => {
+            let room = roomsData[Array.from(socket.rooms)[1]];
+            if(room.firstPlayer == room.playerTurn) {
+                socket.points+=2;
+                io.to(room.firstPlayer).emit('changeTurn', false);
+                io.to(room.secondPlayer).emit('changeTurn', true);
+                room.playerTurn = room.secondPlayer;
+            } else if(room.secondPlayer == room.playerTurn) {
+                socket.points+=2;
+                io.to(room.firstPlayer).emit('changeTurn', true);
+                io.to(room.secondPlayer).emit('changeTurn', false);
+                room.playerTurn = room.firstPlayer;
             }
         });
 
@@ -67,12 +87,12 @@ module.exports = (io) => {
             }
         });
 
-        socket.on('getRandCard', async () => {
-            console.log('room ' + (await Card.getRandCard()).character_name);
-            socket.emit('receiveCard', await Card.getRandCard());
-        });
+        
+
         socket.on('disconnect', async () => {
             console.log('Player disconnected:', socket.id);
         });
+
+
     });
 };
