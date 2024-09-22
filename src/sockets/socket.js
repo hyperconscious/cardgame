@@ -102,7 +102,6 @@ module.exports = (io) => {
             const rooms = Array.from(socket.rooms).filter(roomId => roomId !== socket.id);
             for (const roomId of rooms) {
                 console.log(`Leaving room ${roomId}, player: ${socket.userId}`);
-                socket.leave(roomId);
             
                 const room = await Room.findById(roomId);
                 if(!room) return;
@@ -115,6 +114,7 @@ module.exports = (io) => {
                     room.removePlayer(socket.id);
                     console.log(`Removing player ${socket.id}`);
                 }
+                socket.leave(roomId);
             }
         });
 

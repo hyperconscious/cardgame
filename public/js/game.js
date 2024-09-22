@@ -189,11 +189,21 @@ async function loadPlayersData(players, isFirstPlayer) {
             }
         });
 
+        function calculatePoints(currentPoints, income, incomeRate, level, maxPoints){
+            let newPoints = currentPoints + income + incomeRate * level;
+
+            if (newPoints > maxPoints) {
+                newPoints =maxPoints;
+            }
+
+            return newPoints;
+        }
+
         function setTurn(val){
             isMyTurn = val;
             console.log('yey ' + val);
             basicText.text = val ? 'Your turn' : 'Not your turn\n just wait(';
-            if(val){
+            if(!val){
                 myPoints = calculatePoints(myPoints, 3, (myPoints / 5), 3, 24);
             }
         }
