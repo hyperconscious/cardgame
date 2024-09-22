@@ -30,7 +30,7 @@ module.exports = (io) => {
                         id: enemy.id,
                         name: enemy.login
                     },
-                    isFirstPlayer: false
+                    isFirstPlayer: socket.userId === room.player1_id
                 };
 
                 roomsData[parseInt(roomId)].firstPlayerCards = new Array(5);
